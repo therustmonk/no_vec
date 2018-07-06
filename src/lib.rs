@@ -1,22 +1,46 @@
+/// This crate contains methods for modifying arrays and converting
+/// them to vectors and back.
+
 use std::{mem, ptr};
 
+/// This trait helps to join array with a new element.
 pub trait Stick<T> {
     type Target;
 
+    /// Appends an item to an array:
+    /// ```rust
+    /// let arr: [u16; 2] = [123u16].stick(456);
+    /// ```
     fn stick(self, item: T) -> Self::Target;
 }
 
+/// This trait helps to remove an item element from sized array.
 pub trait Unstick<T> {
     type Target;
 
+    /// Removes an item from an array:
+    /// ```rust
+    /// let (arr, item): ([u16; 1], u16) = [123u16, 456].unstick();
+    /// ```
     fn unstick(self) -> (Self::Target, T);
 }
 
+/// Helps to covert `Vec<T>` to `[T]`.
 pub trait Concrete<T>: Sized {
+    /// Converts from a vector to an array:
+    /// ```rust
+    /// let arr: [u16; 2] = vec![123u16, 456].concrete();
+    /// ```
     fn concrete(self) -> Result<T, Self>;
 }
 
+/// Helps to covert `[T]` into `Vec<T>`.
 pub trait Melt<T> {
+
+    /// Converts from an array to a vector:
+    /// ```rust
+    /// let vec: Vec<u16> = [123u16, 456].melt();
+    /// ```
     fn melt(self) -> Vec<T>;
 }
 

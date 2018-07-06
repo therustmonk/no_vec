@@ -13,7 +13,7 @@ pub trait Unstick<T> {
 }
 
 macro_rules! impl_stick_unstick {
-    [$from:expr ; $to:expr] => {
+    ($from:expr, $to:expr) => {
         impl<T> Stick<T> for [T; $from] {
             type Target = [T; $to];
 
@@ -53,17 +53,38 @@ macro_rules! impl_stick_unstick {
     };
 }
 
-impl_stick_unstick![1;2];
+macro_rules! impl_stick_unstick_all {
+    () => { };
+    ($last:expr ,) => { };
+    ($from:expr , $to:expr , $($qnt:expr,)*) => {
+        impl_stick_unstick!($from, $to);
+        impl_stick_unstick_all!($to, $( $qnt, )*);
+    };
+}
+
+impl_stick_unstick_all!(
+    1, 2, 3, 4, 5, 6, 7, 8, 9,
+    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
+    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
+    30, 31, 32,
+);
 
 #[cfg(test)]
 mod tests {
     use {Stick, Unstick};
 
     #[test]
-    fn it_works() {
-        let arr: [u8; 2] = [123].stick(321);
+    fn test_stick_and_unstick() {
+        let arr = [123].stick(321);
         assert_eq!(arr, [123, 321]);
+
+        let arr = arr.stick(999);
+        assert_eq!(arr, [123, 321, 999]);
+
         let pair = arr.unstick();
+        assert_eq!(pair, ([123, 321], 999));
+
+        let pair = pair.0.unstick();
         assert_eq!(pair, ([123], 321));
     }
 }

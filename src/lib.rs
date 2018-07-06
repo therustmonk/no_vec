@@ -9,6 +9,8 @@ pub trait Stick<T> {
 
     /// Appends an item to an array:
     /// ```rust
+    /// # extern crate no_vec;
+    /// # use no_vec::Stick;
     /// let arr: [u16; 2] = [123u16].stick(456);
     /// ```
     fn stick(self, item: T) -> Self::Target;
@@ -20,6 +22,8 @@ pub trait Unstick<T> {
 
     /// Removes an item from an array:
     /// ```rust
+    /// # extern crate no_vec;
+    /// # use no_vec::Unstick;
     /// let (arr, item): ([u16; 1], u16) = [123u16, 456].unstick();
     /// ```
     fn unstick(self) -> (Self::Target, T);
@@ -29,7 +33,9 @@ pub trait Unstick<T> {
 pub trait Concrete<T>: Sized {
     /// Converts from a vector to an array:
     /// ```rust
-    /// let arr: [u16; 2] = vec![123u16, 456].concrete();
+    /// # extern crate no_vec;
+    /// # use no_vec::Concrete;
+    /// let arr: Result<[u16; 2], Vec<u16>> = vec![123u16, 456].concrete();
     /// ```
     fn concrete(self) -> Result<T, Self>;
 }
@@ -39,6 +45,8 @@ pub trait Melt<T> {
 
     /// Converts from an array to a vector:
     /// ```rust
+    /// # extern crate no_vec;
+    /// # use no_vec::Melt;
     /// let vec: Vec<u16> = [123u16, 456].melt();
     /// ```
     fn melt(self) -> Vec<T>;

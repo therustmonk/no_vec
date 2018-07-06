@@ -16,6 +16,10 @@ pub trait Concrete<T>: Sized {
     fn concrete(self) -> Result<T, Self>;
 }
 
+pub trait Melt<T> {
+    fn melt(self) -> Vec<T>;
+}
+
 macro_rules! impl_stick_unstick {
     ($from:expr, $to:expr) => {
         impl<T> Stick<T> for [T; $from] {
@@ -67,6 +71,14 @@ macro_rules! impl_stick_unstick {
                 }
             }
         }
+
+        impl<T> Melt<T> for [T; $from] {
+            fn melt(self) -> Vec<T> {
+                let boxed: Box<[T]> = Box::new(self);
+                boxed.into_vec()
+            }
+        }
+
     };
 }
 
@@ -88,7 +100,7 @@ impl_stick_unstick_all!(
 
 #[cfg(test)]
 mod tests {
-    use {Concrete, Stick, Unstick};
+    use {Concrete, Melt, Stick, Unstick};
 
     #[test]
     fn test_stick_and_unstick() {
@@ -98,8 +110,14 @@ mod tests {
         let arr = arr.stick(999);
         assert_eq!(arr, [123, 321, 999]);
 
-        let vec = Box::new(arr).to_vec();
-        let arr: [u16; 3] = vec.concrete().unwrap();
+        let mut vec: Vec<u16> = arr.melt();
+        vec.push(111);
+        let arr: [u16; 4] = vec.concrete().unwrap();
+        assert_eq!(arr, [123, 321, 999, 111]);
+
+        let (arr, item) = arr.unstick();
+        assert_eq!(arr, [123, 321, 999]);
+        assert_eq!(item, 111);
 
         let (arr, item) = arr.unstick();
         assert_eq!(arr, [123, 321]);

@@ -32,7 +32,7 @@ assert_eq!(arr, [123, 456]);
 
 ### `[T]::melt() -> Vec<T>`
 
-Convers a sized array to a vector:
+Converts a sized array to a vector:
 
 ```rust
 let vec: Vec<u16> = [123u16, 456].melt();

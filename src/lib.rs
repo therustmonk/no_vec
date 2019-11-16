@@ -1,7 +1,8 @@
 /// This crate contains methods for modifying arrays and converting
 /// them to vectors and back.
 
-use std::{mem, ptr};
+use std::ptr;
+use std::mem::MaybeUninit;
 
 /// This trait helps to join array with a new element.
 pub trait Stick<T> {
@@ -59,7 +60,7 @@ macro_rules! impl_stick_unstick {
 
             fn stick(self, item: T) -> Self::Target {
                 unsafe {
-                    let mut result: Self::Target = mem::uninitialized();
+                    let mut result: Self::Target = MaybeUninit::uninit().assume_init();
                     ptr::copy(
                         self.as_ptr(),
                         result.as_mut_ptr(),
@@ -76,13 +77,13 @@ macro_rules! impl_stick_unstick {
 
             fn unstick(mut self) -> (Self::Target, T) {
                 unsafe {
-                    let mut result: Self::Target = mem::uninitialized();
+                    let mut result: Self::Target = MaybeUninit::uninit().assume_init();
                     ptr::copy(
                         self.as_ptr(),
                         result.as_mut_ptr(),
                         $from,
                     );
-                    let mut item: T = mem::uninitialized();
+                    let mut item: T = MaybeUninit::uninit().assume_init();
                     ptr::swap(&mut item, &mut self[$from]);
                     (result, item)
                 }
@@ -93,7 +94,7 @@ macro_rules! impl_stick_unstick {
             fn concrete(self) -> Result<[T; $from], Self> {
                 if self.len() == $from {
                     unsafe {
-                        let mut result: [T; $from] = mem::uninitialized();
+                        let mut result: [T; $from] = MaybeUninit::uninit().assume_init();
                         ptr::copy(self.as_ptr(), result.as_mut_ptr(), $from);
                         drop(self);
                         Ok(result)

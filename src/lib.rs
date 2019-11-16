@@ -1,8 +1,7 @@
+use std::mem::MaybeUninit;
 /// This crate contains methods for modifying arrays and converting
 /// them to vectors and back.
-
 use std::ptr;
-use std::mem::MaybeUninit;
 
 /// This trait helps to join array with a new element.
 pub trait Stick<T> {
@@ -43,7 +42,6 @@ pub trait Concrete<T>: Sized {
 
 /// Helps to covert `[T]` into `Vec<T>`.
 pub trait Melt<T> {
-
     /// Converts from an array to a vector:
     /// ```rust
     /// # extern crate no_vec;
@@ -61,11 +59,7 @@ macro_rules! impl_stick_unstick {
             fn stick(self, item: T) -> Self::Target {
                 unsafe {
                     let mut result: Self::Target = MaybeUninit::uninit().assume_init();
-                    ptr::copy(
-                        self.as_ptr(),
-                        result.as_mut_ptr(),
-                        $from,
-                    );
+                    ptr::copy(self.as_ptr(), result.as_mut_ptr(), $from);
                     result[$from] = item;
                     result
                 }
@@ -78,11 +72,7 @@ macro_rules! impl_stick_unstick {
             fn unstick(mut self) -> (Self::Target, T) {
                 unsafe {
                     let mut result: Self::Target = MaybeUninit::uninit().assume_init();
-                    ptr::copy(
-                        self.as_ptr(),
-                        result.as_mut_ptr(),
-                        $from,
-                    );
+                    ptr::copy(self.as_ptr(), result.as_mut_ptr(), $from);
                     let mut item: T = MaybeUninit::uninit().assume_init();
                     ptr::swap(&mut item, &mut self[$from]);
                     (result, item)
@@ -111,7 +101,6 @@ macro_rules! impl_stick_unstick {
                 boxed.into_vec()
             }
         }
-
     };
 }
 
@@ -125,10 +114,8 @@ macro_rules! impl_stick_unstick_all {
 }
 
 impl_stick_unstick_all!(
-    1, 2, 3, 4, 5, 6, 7, 8, 9,
-    10, 11, 12, 13, 14, 15, 16, 17, 18, 19,
-    20, 21, 22, 23, 24, 25, 26, 27, 28, 29,
-    30, 31, 32,
+    1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26,
+    27, 28, 29, 30, 31, 32,
 );
 
 #[cfg(test)]
